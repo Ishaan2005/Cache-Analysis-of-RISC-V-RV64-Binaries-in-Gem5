@@ -5,7 +5,7 @@ It involves building a RISC-V cross-compilation toolchain, compiling programs, a
 
 ---
 
-## 📌 Building the RISC-V Toolchain  
+## Building the RISC-V Toolchain  
 
 The **RISC-V GNU toolchain** allows you to compile C/C++ programs into RISC-V binaries.  
 Here, we enable **multilib support**, which provides flexibility to compile programs targeting both 32-bit and 64-bit RISC-V architectures.  
