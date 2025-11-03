@@ -1,0 +1,50 @@
+#!/bin/bash
+# This script builds gem5 and the complete RISC-V toolchain,
+# including multilib support, Spike, and QEMU.
+
+# Set a parallel level for make commands
+NUM_CORES=$(nproc)
+echo "Building using ${NUM_CORES} cores."
+
+# --- 1. Build gem5 (Same as your script) ---
+echo "Cloning and building gem5..."
+git clone https://github.com/gem5/gem5
+cd gem5
+scons build/RISCV/gem5.opt -j${NUM_CORES}
+cd ..
+echo "gem5 build complete."
+
+
+# --- 2. Build Full RISC-V Toolchain ---
+echo "Cloning full RISC-V toolchain (with submodules)..."
+# The --recursive flag is essential to get Spike, QEMU, etc.
+git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+cd riscv-gnu-toolchain
+
+# --- 3. (YOUR MODIFICATION STEP) ---
+# This is the correct place to add your custom instructions
+# before configuring and building the toolchain.
+#
+#    a) Add opcode to 'riscv-opcodes/opcodes'
+#    b) Add instruction to 'riscv-binutils-gdb/include/opscodes/riscv-opc.h'
+#    c) Add instruction to 'riscv-binutils-gdb/opcodes/riscv-opc.c'
+#
+echo "Pausing for 10 seconds. Press Ctrl+C to stop and manually edit opcodes."
+echo "Or, let this continue to build the standard toolchain."
+sleep 10
+
+
+# --- 4. Configure and Build Everything ---
+echo "Configuring toolchain..."
+# /opt/riscv-custom is a good prefix.
+# The default configuration enables multilib support.
+./configure --prefix=/opt/riscv-custom
+
+echo "Building all, spike, and qemu..."
+# 'all' builds the multilib cross-compiler (gcc, binutils, gdb, newlib)
+# 'spike' builds the RISC-V ISA Simulator
+# 'qemu' builds the RISC-V QEMU emulator
+make all spike qemu -j${NUM_CORES}
+
+echo "Full RISC-V ecosystem build complete."
+echo "Add /opt/riscv-custom/bin to your PATH."
